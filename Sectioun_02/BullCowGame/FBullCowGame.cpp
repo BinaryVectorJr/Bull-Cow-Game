@@ -1,3 +1,8 @@
+/* The game logic i.e. the classes and other structures we're using.
+It is based on the fundamental concept of Mastermind */
+
+#pragma once
+
 #include "FBullCowGame.h"
 #include <map>
 #define TMap std::map
@@ -6,21 +11,23 @@
 using FString = std::string;
 using int32 = int;
 
-FBullCowGame::FBullCowGame() { Reset();  }
+FBullCowGame::FBullCowGame() { Reset(); }
 
-int32 FBullCowGame::GetMaxTries() const { return MyMaxTries; }
 int32 FBullCowGame::GetCurrentTry() const { return MyCurrentTry; }
 int32 FBullCowGame::GetHiddenWordLength() const { return MyHiddenWord.length(); }
 bool FBullCowGame::IsGameWon() const { return bGameWon; }
+
+int32 FBullCowGame::GetMaxTries() const 
+{ 
+	TMap<int32, int32> WordLengthToMaxTries{ {3,8}, {4,10}, {5,15}, {6,20}, {7,24} }; //sets up the no. of tries acccording to the length of the word
+	return WordLengthToMaxTries[MyHiddenWord.length()];
+}
 
 
 
 void FBullCowGame::Reset()
 {
-	constexpr int32 MAX_TRIES = 7;
-	MyMaxTries = MAX_TRIES;
-
-	const FString HIDDEN_WORD = "zit"; //4 letter - 7 tries; 5 letter - 15
+	const FString HIDDEN_WORD = "planes"; //the hidden word must be an isogram i.e. that the letters are not repeated
 	MyHiddenWord = HIDDEN_WORD;
 
 	MyCurrentTry = 1;
@@ -28,7 +35,7 @@ void FBullCowGame::Reset()
 	return;
 }
 
-// recieves a valid guess, increments the turn number and returns count
+//recieves a valid guess, increments the turn number and returns count
 FBullCowCount FBullCowGame::SubmitValidGuess(FString Guess)
 {
 	MyCurrentTry++;
@@ -36,7 +43,7 @@ FBullCowCount FBullCowGame::SubmitValidGuess(FString Guess)
 	
 	//loop thrugh each letter in the guess and compare the letters against the letters of the hidden word
 	int32 HiddenWordLength = MyHiddenWord.length();
-	for (int32 MHWChar = 0; MHWChar < HiddenWordLength; MHWChar++)				//MHW = My Hidden Word Character
+	for (int32 MHWChar = 0; MHWChar < HiddenWordLength; MHWChar++) //MHW = My Hidden Word Character
 	{
 		for (int32 GuessChar = 0; GuessChar < HiddenWordLength; GuessChar++)
 		{
@@ -68,7 +75,7 @@ FBullCowCount FBullCowGame::SubmitValidGuess(FString Guess)
 
 EGuessWordStatus FBullCowGame::CheckGuessValidity(FString Guess) const
 {
-	if (!IsIsogram(Guess)) // if word is not isogram
+	if (!IsIsogram(Guess)) //if word is not isogram
 	{
 		return EGuessWordStatus::Not_Isogram;
 	}
@@ -76,11 +83,11 @@ EGuessWordStatus FBullCowGame::CheckGuessValidity(FString Guess) const
 	{
 		return EGuessWordStatus::Case_Mismatch;
 	}
-	else if ( Guess.length() != GetHiddenWordLength() ) //if wrong length is enteres
+	else if ( Guess.length() != GetHiddenWordLength() ) //if wrong length is entered
 	{
 		return EGuessWordStatus::Wrong_Length;
 	}
-	else
+	else //if no other errors send OK
 	{
 		return EGuessWordStatus::OK;
 	}
