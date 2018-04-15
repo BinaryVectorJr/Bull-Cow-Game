@@ -1,10 +1,15 @@
-//NOTE
-//Variable names go for CamelCase as it is Unreal Engine Standard
-//Constant names, go for ALL CAPS
+/*NOTE
+1. Variable names go for CamelCase as it is Unreal Engine Standard
+2. Constant names, go for ALL CAPS*/
+/*TODO later make some code that allows the user to select the difficulty as 3/4/5/6 letters and accordingly
+TODO make a map of <length, structure> where structure holds a series of words, and will be randomly selected*/
+
+#pragma once
 
 #include <iostream>
 #include <string>
 #include "FBullCowGame.h"
+
 
 using FText = std::string;									// In Unreal FText is used to hard print stuff; FString is user modifiable
 using int32 = int;											// again, in Unreal coding standard int32 is used instead of int because of cross compatibility of the game
@@ -30,25 +35,34 @@ int main()
 	return 0;
 }
 
-void PrintIntro()											//introduce the game using a function
+void PrintIntro()	//introduce the game using a function
 {
-	std::cout << "\nWelcome to Bulls and Cows, a fun word game!\n";
+	std::cout << "Welcome to Bulls and Cows, a fun word game.\n";
+	std::cout << std::endl;
+	std::cout << "          }   {         ___ " << std::endl;
+	std::cout << "          (o o)        (o o) " << std::endl;
+	std::cout << "   /-------\\ /          \\ /-------\\ " << std::endl;
+	std::cout << "  / | BULL |O            O| COW  | \\ " << std::endl;
+	std::cout << " *  |-,--- |              |------|  * " << std::endl;
+	std::cout << "    ^      ^              ^      ^ " << std::endl;
+
+	
 	std::cout << "Can you guess the " << BCGame.GetHiddenWordLength() << " letter word I'm thinking of?\n";
 	return;
 }
 
 void PlayGame()
 {
-	BCGame.Reset();											//Resets the initial state so that its a fresh start everytime	
+	BCGame.Reset();	//Resets the initial state so that its a fresh start everytime	
 	int32 MaxTries = BCGame.GetMaxTries();
 
-	while( !BCGame.IsGameWon() && BCGame.GetCurrentTry() <= BCGame.GetMaxTries() )		//Loops for given number of terms
+	while( !BCGame.IsGameWon() && BCGame.GetCurrentTry() <= BCGame.GetMaxTries() )	//Loops for given number of terms
 	{
 		FText UserEntry = "";
 		UserEntry = GetValidGuess();
 		
 		FBullCowCount BullCowCount = BCGame.SubmitValidGuess(UserEntry);
-		std::cout << "\nBulls = " << BullCowCount.Bulls;
+		std::cout << "Bulls = " << BullCowCount.Bulls;
 		std::cout << ", Cows = " << BullCowCount.Cows << "\n\n";
 	
 		PrintGameSummary();
@@ -58,17 +72,17 @@ void PlayGame()
 
 void PrintGameSummary()
 {
-	if (BCGame.GetCurrentTry() > (BCGame.GetMaxTries() + 1))	//I had to put +1 because Index starts from 1 and it was taking 3 as greater than 3 LOL
+	if (BCGame.GetCurrentTry() > BCGame.GetMaxTries())
 	{
 		std::cout << "Sorry, you are out of tries!\n";
 	}
 	else if ( BCGame.IsGameWon() )
 	{
-		std::cout << "Congratulations, you have won the game!\n";
+		std::cout << "CONGRATULATIONS! YOU HAVE WON THE GAME!\n";
 	}
 }
 
-FText GetValidGuess()										//get a valid guess from user by looping continuously
+FText GetValidGuess()	//get a valid guess from user by looping continuously
 {
 	FText Guess = "";
 	EGuessWordStatus Status = EGuessWordStatus::Invalid;
@@ -76,10 +90,10 @@ FText GetValidGuess()										//get a valid guess from user by looping continuo
 	{
 		int32 CurrentGuessNumber = BCGame.GetCurrentTry();
 
-		std::cout << "\nTry " << CurrentGuessNumber << ": Enter your guess: ";
-		std::getline(std::cin, Guess);							//gets user input
+		std::cout << "\nTry " << CurrentGuessNumber << " out of " << BCGame.GetMaxTries() << " --> Enter your guess: ";
+		std::getline(std::cin, Guess);	//gets user input i.e the word they've guessed
 
-		Status = BCGame.CheckGuessValidity(Guess);				//check for status and give feedback to user
+		Status = BCGame.CheckGuessValidity(Guess);	//check for status and give feedback to user
 		switch (Status)
 		{
 		case EGuessWordStatus::Wrong_Length:
@@ -95,7 +109,7 @@ FText GetValidGuess()										//get a valid guess from user by looping continuo
 			break;
 
 		default:
-			break; //assuming all letters are correct
+			break;	//assuming all letters are correct
 		}
 	} while (Status != EGuessWordStatus::OK);	//Keep looping till we get no errors
 	return Guess;
